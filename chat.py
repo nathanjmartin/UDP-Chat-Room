@@ -1,5 +1,8 @@
 import socket
 import sys
+import tkinter
+
+# Need to abstract this with methods/etc along with creating the UI for users.
 
 name = raw_input("Please enter your chatroom name: ")
 print('Welcome to the chatroom, ' + name)
