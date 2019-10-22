@@ -1,23 +1,32 @@
 import socket
-import sys
-import tkinter
+import threading
 
-# Need to abstract this with methods/etc along with creating the UI for users.
+# GUI stuff probably up here
 
-name = raw_input("Please enter your chatroom name: ")
-print('Welcome to the chatroom, ' + name)
 
 # UDP Socket
 socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp_ip = '127.0.0.1'
-udp_port = 10000
+udp_port = 12000
 
-# Try to let user type message and send through the socket
-while True:
-        # send data
-        message = raw_input(name + ": ")
-        socket.sendto(message, (udp_ip, udp_port))
+def send_message(message):
+        socket.sendto(message.encode('utf-8'), (udp_ip, udp_port))
 
-        # receive data
-        response, address = socket.recvfrom(4096)
-        print('User1: ' + str(response))
+def receive_message():
+        while True:
+                response, address = socket.recvfrom(4096)
+                message = response.decode("utf-8", "ignore")
+                print(message)
+
+
+if __name__ == "__main__":
+    # Not sure about this threading stuff
+    receive_thread = threading.Thread(target=receive_message)
+    receive_thread.start()
+
+    name = input("Enter your chatroom name: ")
+    while True:
+            message = input(name + ": ")
+            message = name + ": " + message
+            send_message(message)
+            receive_message()
