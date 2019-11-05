@@ -9,6 +9,7 @@ socket.bind((udp_ip, udp_port))
 
 # list to hold the addresses
 addresses = []
+# list to hold the messages
 messages = []
 
 while True:
@@ -20,8 +21,17 @@ while True:
     if address in addresses:
         print("")
     else:
-        print("New client connected to chatroom ")
-        addresses.append(address)
+        # HANDSHAKE PROCESS
+        # send the ackowledgement of the syn packet if it receives it
+        SYNACK = 'SYNACK'
+        if 'SYN' in str(recv):
+            socket.sendto(SYNACK.encode('utf-8'), address)
+        # listen for the acknowledgement
+        recv, address = socket.recvfrom(4096)
+        if 'ACK' in str(recv):
+            print('Handshake completed!')
+            print("New client connected to chatroom ")
+            addresses.append(address)
     
     # prints out all the client's sent messages if requested
     if 'list_messages' in recv.decode("utf-8", "ignore"):

@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 
 # GUI stuff probably up here
 
@@ -10,18 +11,42 @@ udp_ip = '127.0.0.1'
 udp_port = 12000
 
 # go-back-N to resend any lost data
-def reliable_message_transfer():
-        pass
+# I'd like my timeout to be 5 seconds
+def reliable_message_transfer(message):
+        sequence_number = 123
+        message = message + str(sequence_number)
 
-def reliable_message_receive():
-        pass
+        # start the timer
+        start_time = time.time()
+        # code for sending the packet here
+        socket.sendto(message.encode('utf-8'), (udp_ip, udp_port))
+        # code for receiving packet here
+        msg, address = socket.recvfrom(4096)
+
+        end_time = time.time()
+        # code for resending the message if there is a timeout or not the correct ack is received
+        if (end_time - start_time >= 5) or 'ACK' + str(sequence_number) not in msg: # OR ACK + sequence_number not in msg
+                socket.sendto(message.encode('utf-8'), (udp_ip, udp_port))
+
 
 def file_transfer(file):
         pass
 
 # Handshake to establish a connection
-def handshake(seq):
-        pass
+def handshake():
+        SYN = 'SYN_packet'
+        ACK = 'ACK_packet'
+        # need to send a packet with the sequence number, & if the server responds with the correct ack w/ the same seq number, send the message
+        socket.sendto(SYN.encode('utf-8'), (udp_ip, udp_port))
+
+        # grab the response
+        response, address = socket.recvfrom(4096)
+
+        # check if the response is a SYNACK packet
+        if 'SYNACK' in str(response):
+                socket.sendto(ACK.encode('utf-8'), (udp_ip, udp_port))
+                print('Handshake completed!')
+
 
 def send_message(message):
         socket.sendto(message.encode('utf-8'), (udp_ip, udp_port))
@@ -34,9 +59,15 @@ def receive_message():
 
 if __name__ == "__main__":
     receive_thread = threading.Thread(target=receive_message)
+    # perform a handshake between the client & server
+    handshake()
+
+    # prompt user for name
     name = input("Enter your chatroom name: ")
     send_message(name + " connected to the chatroom!")
     print('Type list_messages to see all of your messages! ')
+    print(name + " connected to the chatroom!")
+    # start the receive messages thread
     receive_thread.start()
     while True:
             message = input("")
