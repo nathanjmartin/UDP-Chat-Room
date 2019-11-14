@@ -14,8 +14,17 @@ messages = []
 
 while True:
     recv, address = socket.recvfrom(4096)
+    # grab the sequence number off of recv and save it in a variable
+    decoded = str(recv)
+    # find first occurence of seq
+    seq_index = decoded.find('seq')
+    # since seq number is going to be appended to the end of the message,
+    # take from the seq_index, to the end of the string
+    sequence_number = decoded[seq_index:]
+
     print(recv)
     print(address)
+    print(sequence_number)
     messages.append(recv)
 
     if address in addresses:
@@ -39,6 +48,40 @@ while True:
         socket.sendto(msg_notification.encode('utf-8'), address)
         for message in messages:
             socket.sendto(message, address)
+    
+    if 'file_transfer' in recv.decode("utf-8", "ignore"):
+        # receive the file
+        buffer = 1024
+        data, addr = socket.recvfrom(buffer)
+        print('Received file'), data.strip()
+        f = open(data.strip(), 'wb')
+        
+        data, addr = socket.recvfrom(buffer)
+
+        # try writing, and if there is still data, continue writing
+        try:
+            while(data):
+                f.write(data)
+                data, addr = socket.recvfrom(buffer)
+        except:
+            f.close()
+            print('File downloaded')
+
+        # SEND FILE TO ALL CLIENTS
+
+        # open the file, read binary
+        send_file = open(f, "rb")
+        new_data = send_file.read(buffer)
+
+
+        # send 1024 bytes at a time of the file
+        socket.sendto(new_data, (udp_ip, udp_port))
+
+        # while there is still data, continue sending the rest of the file
+        while(new_data):
+                if(socket.sendto(new_data, (udp_ip, udp_port))):
+                        print('Sending file...')
+                        new_data = send_file.read(buffer)
 
     #Sends back message to each client that has connected
     for client in addresses:

@@ -13,13 +13,16 @@ udp_port = 12000
 # go-back-N to resend any lost data
 # I'd like my timeout to be 5 seconds
 def reliable_message_transfer(message):
-        sequence_number = 123
+        sequence_number = 'seq123'
+        # add the sequence number to the message
         message = message + str(sequence_number)
+
+        # code for sending the packet here
+        socket.sendto(message.encode('utf-8'), (udp_ip, udp_port))
 
         # start the timer
         start_time = time.time()
-        # code for sending the packet here
-        socket.sendto(message.encode('utf-8'), (udp_ip, udp_port))
+       
         # code for receiving packet here
         msg, address = socket.recvfrom(4096)
 
@@ -29,7 +32,24 @@ def reliable_message_transfer(message):
                 socket.sendto(message.encode('utf-8'), (udp_ip, udp_port))
 
 
-def file_transfer(file):
+# NEED TO IMPLEMENT SEQUENCE NUMBERS ON THIS STILL
+def file_transfer(file_name):
+        buffer = 1024
+        # open the file, read binary
+        f = open(file_name, "rb")
+        data = f.read(buffer)
+
+        # send 1024 bytes at a time of the file
+        socket.sendto(data, (udp_ip, udp_port))
+
+        # while there is still data, continue sending the rest of the file
+        while(data):
+                if(socket.sendto(data, (udp_ip, udp_port))):
+                        print('Sending file...')
+                        data = f.read(buffer)
+
+# Receiving the file from the server
+def file_receive(file_name):
         pass
 
 # Handshake to establish a connection
@@ -64,6 +84,7 @@ if __name__ == "__main__":
 
     # prompt user for name
     name = input("Enter your chatroom name: ")
+    print('-----------------------------------------------------------------------------')
     send_message(name + " connected to the chatroom!")
     print('Type list_messages to see all of your messages! ')
     print(name + " connected to the chatroom!")
