@@ -11,6 +11,7 @@ socket.bind((udp_ip, udp_port))
 addresses = []
 # list to hold the messages
 messages = []
+emojis = ["\U0001f600", "\U0001F606", "\U0001F923"]
 
 while True:
     recv, address = socket.recvfrom(4096)

@@ -2,13 +2,16 @@ import socket
 import threading
 import time
 
-# GUI stuff probably up here
+# GUI stuff probably up here if there is time
 
 
 # UDP Socket
 socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp_ip = '127.0.0.1'
 udp_port = 12000
+
+# UNICODE values for some emojis
+emojis = ["\U0001f600", "\U0001F606", "\U0001F923"]
 
 # go-back-N to resend any lost data
 # I'd like my timeout to be 5 seconds
@@ -48,9 +51,6 @@ def file_transfer(file_name):
                         print('Sending file...')
                         data = f.read(buffer)
 
-# Receiving the file from the server
-def file_receive(file_name):
-        pass
 
 # Handshake to establish a connection
 def handshake():
@@ -69,6 +69,13 @@ def handshake():
 
 
 def send_message(message):
+        if ':D' in message:
+                message += emojis[1]
+        if ':)' in message:
+                message += emojis[0]
+        if 'xD' in message:
+                message += emojis[2]
+                
         socket.sendto(message.encode('utf-8'), (udp_ip, udp_port))
 
 def receive_message():
