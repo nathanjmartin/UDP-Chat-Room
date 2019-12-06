@@ -11,3 +11,9 @@ UDP Chat Room
         - cd into the directory where you downloaded the files
         - Run `python chat.py`
         - Run this in multiple terminals if you want to have multiple clients
+
+    * Commands
+        - Entering a chat room & typing your name will execute a handshake between the client & server
+        - list_messages will show all previous messages
+        - file_transfer { x } initiates file transfer
+        
