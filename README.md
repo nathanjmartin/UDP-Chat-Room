@@ -1,7 +1,8 @@
 UDP Chat Room
 -----------------------------
+* Python 3.7.5
 * How to Download the Programs
-    * Downloading chat.py & server.py
+    * Clone this repo `git clone https://github.com/nathanjmartin/UDP-Chat-Room`
 * How To Run the Programs
     * Running server.py
         - cd into the directory where you downloaded the files
